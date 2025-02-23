@@ -38,7 +38,7 @@ const App = () => {
     if (gameStarted && !gameOver) {
       intervalId = setInterval(() => {
         setTimeRemaining((prevTime) => {
-          if (prevTime > 0) return prevTime - 1;
+          if (prevTime > 0) return prevTime - 1 + score * 0.1;
           clearInterval(intervalId);
           setMessage('Time out!');
           setCanPlay(false);
@@ -93,8 +93,7 @@ const App = () => {
           key = '→';
           break;
       }
-
-      const audioBeep = new Audio('/sounds/beep.mp3');
+      const audioBeep = new Audio('/Helldivers/sounds/beep.mp3');
       audioBeep.volume = 0.5;
       audioBeep.play();
 
@@ -108,7 +107,8 @@ const App = () => {
           setMessage('Code Accepted');
           setScore((prevScore) => prevScore + 1);
           updateBestScore();
-          const audioLevelUp = new Audio('/sounds/level-up.mp3');
+          setTimeRemaining((prevTime) => prevTime + 1);
+          const audioLevelUp = new Audio('/Helldivers/sounds/level-up.mp3');
           audioLevelUp.volume = 1;
           audioLevelUp.play();
           setIsTransitioning(true);
@@ -176,6 +176,7 @@ const App = () => {
       ) : (
         <StartScreen startGame={startGame} />
       )}
+      <p className="mt-4 text-sm text-gray-300">With ❤️ by <a href="https://www.yiyehdev.com" target="_blank" className='hover:underline text-yellow-200'>YiyehDev</a></p>
     </div>
   );
 };
