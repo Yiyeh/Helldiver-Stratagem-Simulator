@@ -18,6 +18,7 @@ const App = () => {
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [bestScore, setBestScore] = useState<number>(0);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(0.5); // Estado para el volumen
 
   // Cargar el mejor puntaje desde localStorage al iniciar
   useEffect(() => {
@@ -43,7 +44,7 @@ const App = () => {
           setMessage('Time out!');
           setCanPlay(false);
           setGameOver(true);
-          updateBestScore();
+          updateBestScore(score);
           return 0;
         });
       }, 1000);
@@ -51,11 +52,14 @@ const App = () => {
     return () => clearInterval(intervalId);
   }, [gameStarted, gameOver]);
 
-  const updateBestScore = () => {
-    if (score > bestScore) {
-      setBestScore(score);
-      localStorage.setItem('bestScore', score.toString());
-    }
+  const updateBestScore = (newScore: number) => {
+    setBestScore((prevBestScore) => {
+      if (newScore > prevBestScore) {
+        localStorage.setItem('bestScore', newScore.toString());
+        return newScore;
+      }
+      return prevBestScore;
+    });
   };
 
   const startNewStratagem = () => {
@@ -69,11 +73,9 @@ const App = () => {
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!canPlay || isTransitioning || gameOver || !gameStarted) return;
-
     let key = event.key.toUpperCase();
     const arrowKeys = ['ARROWUP', 'ARROWDOWN', 'ARROWLEFT', 'ARROWRIGHT'];
     const wasdKeys = ['W', 'A', 'S', 'D'];
-
     if (arrowKeys.includes(key) || wasdKeys.includes(key)) {
       switch (key) {
         case 'ARROWUP':
@@ -93,24 +95,21 @@ const App = () => {
           key = '→';
           break;
       }
-      const audioBeep = new Audio('/Helldivers/sounds/beep.mp3');
-      audioBeep.volume = 0.5;
-      audioBeep.play();
-
+      playSound('/Helldivers/sounds/beep.mp3', volume); // Reproducir sonido con volumen ajustado
       const newSequence = [...inputSequence, key];
       setInputSequence(newSequence);
-
       if (currentStratagem) {
         const correctSequence = currentStratagem.sequence;
-
         if (newSequence.join('') === correctSequence.join('')) {
           setMessage('Code Accepted');
-          setScore((prevScore) => prevScore + 1);
-          updateBestScore();
+          setScore((prevScore) => {
+            const newScore = prevScore + 1;
+            updateBestScore(newScore);
+            return newScore;
+          });
+          updateBestScore(score);
           setTimeRemaining((prevTime) => prevTime + 1);
-          const audioLevelUp = new Audio('/Helldivers/sounds/level-up.mp3');
-          audioLevelUp.volume = 1;
-          audioLevelUp.play();
+          playSound('/Helldivers/sounds/level-up.mp3', volume); // Reproducir sonido con volumen ajustado
           setIsTransitioning(true);
           setTimeout(() => {
             setMessage('');
@@ -126,6 +125,12 @@ const App = () => {
         }
       }
     }
+  };
+
+  const playSound = (src: string, volume: number) => {
+    const audio = new Audio(src);
+    audio.volume = volume; // Ajustar volumen
+    audio.play();
   };
 
   const startGame = () => {
@@ -176,7 +181,30 @@ const App = () => {
       ) : (
         <StartScreen startGame={startGame} />
       )}
-      <p className="mt-4 text-sm text-gray-300">With ❤️ by <a href="https://www.yiyehdev.com" target="_blank" className='hover:underline text-yellow-200'>YiyehDev</a></p>
+
+      {/* Control de volumen */}
+      <div className="mt-6 w-full max-w-xs">
+        <label htmlFor="volume" className="block text-sm font-bold text-yellow-300 mb-2">
+          Volume: {Math.round(volume * 100)}%
+        </label>
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
+          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+        />
+      </div>
+
+      <p className="mt-4 text-sm text-gray-300">
+        With ❤️ by{' '}
+        <a href="https://www.yiyehdev.com" target="_blank" className="hover:underline text-yellow-200">
+          YiyehDev
+        </a>
+      </p>
     </div>
   );
 };
