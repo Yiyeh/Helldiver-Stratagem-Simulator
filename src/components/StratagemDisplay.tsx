@@ -11,11 +11,11 @@ const StratagemDisplay = ({ sequence, inputSequence }: StratagemDisplayProps) =>
       {sequence.map((step, index) => (
         <motion.div
           key={index}
-          className={`w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-2 font-bold text-3xl bg-gray-700 shadow-lg rounded-md ${
+          className={`w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border-5 font-bold text-3xl bg-gray-700 shadow-lg rounded-md ${
             inputSequence[index] === step ? 'border-green-500' : 'border-red-500'
           }`}
         >
-          {step}
+          <p className='text-4xl font-extrabold'>{step}</p>
         </motion.div>
       ))}
     </div>

@@ -7,6 +7,9 @@ import GameOverScreen from './components/GameOverScreen';
 import FeedbackMessage from './components/FeedbackMessage';
 import { stratagems, Stratagem } from './data/stratagems';
 
+
+
+
 const App = () => {
   const [currentStratagem, setCurrentStratagem] = useState<Stratagem | null>(null);
   const [inputSequence, setInputSequence] = useState<string[]>([]);
@@ -20,6 +23,7 @@ const App = () => {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.5); // Estado para el volumen
 
+  
   // Cargar el mejor puntaje desde localStorage al iniciar
   useEffect(() => {
     const savedBestScore = localStorage.getItem('bestScore');
@@ -95,8 +99,13 @@ const App = () => {
           key = '→';
           break;
       }
+      sendKey(key);  
+    }
+  };
+
+  const sendKey = (key: string) => {
+    const newSequence = [...inputSequence, key];
       playSound('/Helldivers/sounds/beep.mp3', volume); // Reproducir sonido con volumen ajustado
-      const newSequence = [...inputSequence, key];
       setInputSequence(newSequence);
       if (currentStratagem) {
         const correctSequence = currentStratagem.sequence;
@@ -114,7 +123,7 @@ const App = () => {
           setTimeout(() => {
             setMessage('');
             startNewStratagem();
-          }, 1000);
+          }, 300);
         } else if (!correctSequence.join('').startsWith(newSequence.join(''))) {
           setMessage('Code Denied.');
           setIsTransitioning(true);
@@ -124,8 +133,7 @@ const App = () => {
           }, 1000);
         }
       }
-    }
-  };
+  }
 
   const playSound = (src: string, volume: number) => {
     const audio = new Audio(src);
@@ -156,6 +164,8 @@ const App = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [inputSequence, canPlay, isTransitioning, gameOver, gameStarted]);
 
+  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-950 text-gray-100 font-mono px-6 relative overflow-hidden border-4 border-yellow-400">
       <Header />
@@ -163,12 +173,15 @@ const App = () => {
         <>
           <TimerBar timeRemaining={timeRemaining} />
           {!gameOver ? (
+            <>
+            
             <GameScreen
               currentStratagem={currentStratagem}
               inputSequence={inputSequence}
               score={score}
               bestScore={bestScore}
             />
+            </>
           ) : (
             <GameOverScreen
               score={score}

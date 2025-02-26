@@ -26,7 +26,7 @@ const GameOverScreen = ({ score, bestScore, restartGame }: GameOverScreenProps) 
         onClick={() => window.open('https://buymeacoffee.com/yiyeh', '_blank')}
         className="mt-6 px-6 py-3 bg-yellow-400 text-gray-900 font-bold text-xl rounded-lg hover:bg-yellow-500 transition-colors"
       >
-        Buy me a Liber-tea ☕ for democratic support
+        Support me with a Liber-tea ☕️
       </button>
     </div>
   );
